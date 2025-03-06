@@ -1,5 +1,6 @@
 package com.tictactoe;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,9 +19,20 @@ public class LogicServlet extends HttpServlet {
         Field field = extractField(currentSession);
 
         int index = getSelectedIndex(req);
-        field.getField().put(index, Sign.CROSS);
-        List<Sign> data = field.getFieldData();
+        Sign currentSign = field.getField().get(index);
+        if (Sign.EMPTY != currentSign) {
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
+            dispatcher.forward(req, resp);
+            return;
+        }
 
+        field.getField().put(index, Sign.CROSS);
+        int emptyFieldIndex = field.getEmptyFieldIndex();
+        if (emptyFieldIndex >= 0) {
+            field.getField().put(emptyFieldIndex, Sign.NOUGHT);
+        }
+
+        List<Sign> data = field.getFieldData();
         currentSession.setAttribute("data", data);
         currentSession.setAttribute("field", field);
 
