@@ -27,9 +27,15 @@ public class LogicServlet extends HttpServlet {
         }
 
         field.getField().put(index, Sign.CROSS);
+        if (checkWin(resp, currentSession, field)) {
+            return;
+        }
         int emptyFieldIndex = field.getEmptyFieldIndex();
         if (emptyFieldIndex >= 0) {
             field.getField().put(emptyFieldIndex, Sign.NOUGHT);
+            if (checkWin(resp, currentSession, field)) {
+                return;
+            }
         }
 
         List<Sign> data = field.getFieldData();
@@ -52,5 +58,17 @@ public class LogicServlet extends HttpServlet {
         String click = request.getParameter("click");
         boolean isNumeric = click.chars().allMatch(Character::isDigit);
         return isNumeric ? Integer.parseInt(click) : 0;
+    }
+
+    private boolean checkWin(HttpServletResponse response, HttpSession currentSession, Field field) throws IOException {
+        Sign winner = field.checkWin();
+        if (Sign.CROSS == winner || Sign.NOUGHT == winner) {
+            currentSession.setAttribute("winner", winner);
+            List<Sign> data = field.getFieldData();
+            currentSession.setAttribute("data", data);
+            response.sendRedirect("/index.jsp");
+            return true;
+        }
+        return false;
     }
 }
