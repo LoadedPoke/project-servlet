@@ -36,6 +36,8 @@ public class LogicServlet extends HttpServlet {
             if (checkWin(resp, currentSession, field)) {
                 return;
             }
+        } else {
+            currentSession.setAttribute("draw", true);
         }
 
         List<Sign> data = field.getFieldData();
